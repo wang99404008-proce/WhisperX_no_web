@@ -94,12 +94,15 @@ def run_process():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         compute_type = "float16" if device == "cuda" else "int8"
 
+        # 直接指定 .exe 旁邊 models/對應模型名稱 的簡單資料夾
+        local_model_path = os.path.join(base_dir, "models", model_size)
+        
         status_label.config(text=f"正在從本機載入模型 ({model_size})...", bootstyle="info")
         progress_bar['value'] = 10
         app.update_idletasks()
         
-        # 由於上方已指定 HUGGINGFACE_HUB_CACHE，它會直接讀取 models 資料夾內的檔案
-        model = WhisperModel(model_size, device=device, compute_type=compute_type, local_files_only=True)
+        # 直接傳入本機資料夾絕對路徑，並強制鎖定本機，絕不連網
+        model = WhisperModel(local_model_path, device=device, compute_type=compute_type, local_files_only=True)
 
         status_label.config(text="辨識中：AI 正在轉寫語音內容...", bootstyle="info")
         progress_bar['value'] = 20
