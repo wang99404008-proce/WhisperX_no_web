@@ -99,7 +99,7 @@ def run_process():
         app.update_idletasks()
         
         # 由於上方已指定 HUGGINGFACE_HUB_CACHE，它會直接讀取 models 資料夾內的檔案
-        model = WhisperModel(model_size, device=device, compute_type=compute_type)
+        model = WhisperModel(model_size, device=device, compute_type=compute_type, local_files_only=True)
 
         status_label.config(text="辨識中：AI 正在轉寫語音內容...", bootstyle="info")
         progress_bar['value'] = 20
