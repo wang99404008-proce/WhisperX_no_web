@@ -9,14 +9,14 @@ from ttkbootstrap.constants import *
 from tkinter import filedialog, messagebox, StringVar
 
 app = ttk.Window(themename="superhero")
-app.title("Whisper 智慧影音轉檔與進度追蹤工具")
+app.title("Whisper 影音智慧轉檔工具")
 app.geometry("680x620")
 app.resizable(False, False)
 
 audio_file_path = ""
 output_folder_path = ""
 
-# 語言下拉選單：清楚顯示中文名稱與代碼
+# 語言下拉選單
 LANGUAGES = {
     "中文 (zh)": "zh",
     "英文 (en)": "en",
@@ -86,16 +86,7 @@ def run_process():
         progress_bar['value'] = 10
         app.update_idletasks()
         
-        # 取得 .exe 旁邊的 models 資料夾路徑
-if getattr(sys, 'frozen', False):
-    base_dir = os.path.dirname(sys.executable)
-else:
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-
-local_model_path = os.path.join(base_dir, "models", f"models--Systran--faster-whisper-{model_size}")
-
-# 【強制離線模式】local_files_only=True 確保絕不上網，只讀取旁邊的資料夾
-model = WhisperModel(local_model_path, device=device, compute_type=compute_type, local_files_only=True)
+        model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
         status_label.config(text="辨識中：AI 正在轉寫語音內容...", bootstyle="info")
         progress_bar['value'] = 20
