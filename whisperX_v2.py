@@ -1,5 +1,17 @@
 import os
 import sys
+
+# 【絕對離線核心設定】必須寫在所有套件載入的最前面！
+# 強制把 Hugging Face 的快取路徑指定到 .exe 旁邊的 models 資料夾
+if getattr(sys, 'frozen', False):
+    base_dir = os.path.dirname(sys.executable)
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+local_models_dir = os.path.join(base_dir, "models")
+os.environ["HUGGINGFACE_HUB_CACHE"] = local_models_dir
+os.environ["HF_HOME"] = local_models_dir
+
 import threading
 import torch
 import torchaudio
@@ -9,7 +21,7 @@ from ttkbootstrap.constants import *
 from tkinter import filedialog, messagebox, StringVar
 
 app = ttk.Window(themename="superhero")
-app.title("Whisper 影音智慧轉檔工具")
+app.title("Whisper 影音智慧轉檔工具 (支援離線)")
 app.geometry("680x620")
 app.resizable(False, False)
 
@@ -82,10 +94,11 @@ def run_process():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         compute_type = "float16" if device == "cuda" else "int8"
 
-        status_label.config(text=f"正在載入 AI 模型 ({model_size})...", bootstyle="info")
+        status_label.config(text=f"正在從本機載入模型 ({model_size})...", bootstyle="info")
         progress_bar['value'] = 10
         app.update_idletasks()
         
+        # 由於上方已指定 HUGGINGFACE_HUB_CACHE，它會直接讀取 models 資料夾內的檔案
         model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
         status_label.config(text="辨識中：AI 正在轉寫語音內容...", bootstyle="info")
